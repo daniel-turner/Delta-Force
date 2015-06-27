@@ -1,0 +1,26 @@
+{
+  "name": "delta-force",
+  "version": "1.0.0",
+  "description": "[Events and Emitters - Slides](http://slides.com/theremix/events-and-emitters)",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daniel-turner/Delta-Force.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/daniel-turner/Delta-Force/issues"
+  },
+  "homepage": "https://github.com/daniel-turner/Delta-Force#readme",
+  "devDependencies": {
+    "chai": "^3.0.0",
+    "mocha": "^2.2.5"
+  }
+}
