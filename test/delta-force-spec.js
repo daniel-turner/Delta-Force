@@ -55,6 +55,12 @@ describe('Control', function() {
     timers.control.should.be.a('function');
   });
 
+  it('control accepts a number as input', function() {
+
+    expect(timers.control.bind(timers.control, {})).to.throw('Control was set with an invalid interval.');
+    expect(timers.control.bind(timers.control, NaN)).to.throw('Control cannot be set with a NaN interval.');
+  });
+
   var testControl;
   var testtime = null;
 
