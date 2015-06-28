@@ -37,12 +37,15 @@ describe("Timer", function() {
       testcount = tickEvent.tickCount;
     });
 
+    testTimer.doTick();
+
     setTimeout(function(){
 
       testtime.should.not.be.null;
       testcount.should.not.be.null;
+      testTimer = null;
       done();
-    }, 1000);
+    }, 100);
   });
 
 
@@ -66,10 +69,12 @@ describe('Control', function() {
 
   it('control.start should emit a start event', function(done) {
 
-    testControl = new timers.control(1000);
+    testControl = new timers.control(50);
     testControl.addListener('start', function(startEvent) {
 
       testtime = startEvent.startTime;
+      testControl.stop();
+      testControl = null;
     });
 
     testControl.start();
@@ -78,14 +83,14 @@ describe('Control', function() {
 
       testtime.should.not.be.null;
       done();
-    }, 1500);
+    }, 150);
   });
 
   it('control.stop should emit a stop event', function(done) {
 
     testtime = null;
 
-    testControl = new timers.control(1000);
+    testControl = new timers.control(50);
     testControl.addListener('stop', function(stopEvent) {
 
       testtime = stopEvent.stopTime;
@@ -97,8 +102,9 @@ describe('Control', function() {
     setTimeout(function() {
 
       testtime.should.not.be.null;
+      testControl = null;
       done();
-    }, 1000);
+    }, 150);
 
   });
 });
@@ -133,8 +139,76 @@ describe('TimeLimit', function() {
 
       testtime.should.not.be.null;
       testtime.should.be.above(50);
-      testtime.should.be.below(70);
+      testtime.should.be.below(250);
       done();
     }, 60);
+  });
+});
+
+describe('LagTimer', function() {
+
+  it('lagtimer is a function', function() {
+
+    timers.lagTimer.should.be.a('function');
+  });
+
+  it('lagtimer accepts numbers as input', function() {
+
+    expect(timers.lagTimer.bind(timers.lagTimer, 5, 5, {})).to.throw('LagTimer was set with an invalid allowedDeviation.');
+    expect(timers.lagTimer.bind(timers.lagTimer, 5, 5, NaN)).to.throw('LagTimer cannot be set with a NaN allowedDeviation.');
+    expect(timers.lagTimer.bind(timers.lagTimer, 10, NaN)).to.throw('Control cannot be set with a NaN interval.');
+  })
+
+  it('lagtimer should emit a lag event', function(done) {
+
+    testtime = null;
+    testLagTimer = new timers.lagTimer(1,50,10);
+    testLagTimer.addListener('lag', function(lagEvent) {
+
+      testtime = lagEvent.lag;
+    });
+
+    testLagTimer.start();
+
+    setTimeout(function() {
+
+      testtime.should.not.be.null;
+      testLagTimer.stop();
+      done();
+    }, 150);
+  });
+});
+
+describe('CompensateTimer', function() {
+
+  it('compensateTimer is a function', function() {
+
+    timers.compensateTimer.should.be.a('function');
+  });
+
+  var testCompensateTimer;
+  var startTime;
+  var stopTime;
+
+  it('compensateTimer should alter timer intervals', function(done) {
+
+    testCompensateTimer = new timers.compensateTimer(100,10,50);
+    testCompensateTimer.addListener('start', function(startEvent) {
+
+      startTime = startEvent.startTime;
+    });
+    testCompensateTimer.addListener('stop', function(stopEvent) {
+
+      stopTime = stopEvent.stopTime;
+    });
+
+    testCompensateTimer.start();
+
+    setTimeout(function(){
+
+      console.log((stopTime-startTime) - 1000);
+      stopTime.should.not.be.null;
+      done();
+    }, 100);
   });
 });
