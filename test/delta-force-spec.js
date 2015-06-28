@@ -25,15 +25,13 @@ describe("Timer", function() {
     testTimer.should.be.an.instanceof(EventEmitter);
   })
 
-  var testtime = null;
   var testcount = null;
 
-  it('timer tick event should return time and count', function(done) {
+  it('timer tick event should return count', function(done) {
 
     testTimer = new timers.timer(0);
     testTimer.addListener('tick', function(tickEvent) {
 
-      testtime = tickEvent.tickTime;
       testcount = tickEvent.tickCount;
     });
 
@@ -41,7 +39,6 @@ describe("Timer", function() {
 
     setTimeout(function(){
 
-      testtime.should.not.be.null;
       testcount.should.not.be.null;
       testTimer = null;
       done();
@@ -127,7 +124,7 @@ describe('TimeLimit', function() {
   it('timelimit should emit a complete event after the designated number of ticks', function(done) {
 
     testtime = null;
-    testTimeLimit = new timers.timelimit(10,5);
+    testTimeLimit = new timers.timelimit(2,50);
     testTimeLimit.addListener('complete', function(completeEvent) {
 
       testtime = completeEvent.totalTime;
@@ -138,10 +135,10 @@ describe('TimeLimit', function() {
     setTimeout(function() {
 
       testtime.should.not.be.null;
-      testtime.should.be.above(50);
+      testtime.should.be.above(99);
       testtime.should.be.below(250);
       done();
-    }, 60);
+    }, 250);
   });
 });
 
@@ -157,7 +154,7 @@ describe('LagTimer', function() {
     expect(timers.lagTimer.bind(timers.lagTimer, 5, 5, {})).to.throw('LagTimer was set with an invalid allowedDeviation.');
     expect(timers.lagTimer.bind(timers.lagTimer, 5, 5, NaN)).to.throw('LagTimer cannot be set with a NaN allowedDeviation.');
     expect(timers.lagTimer.bind(timers.lagTimer, 10, NaN)).to.throw('Control cannot be set with a NaN interval.');
-  })
+  });
 
   it('lagtimer should emit a lag event', function(done) {
 
@@ -174,6 +171,7 @@ describe('LagTimer', function() {
 
       testtime.should.not.be.null;
       testLagTimer.stop();
+      testLagTimer = null;
       done();
     }, 150);
   });
@@ -192,7 +190,7 @@ describe('CompensateTimer', function() {
 
   it('compensateTimer should alter timer intervals', function(done) {
 
-    testCompensateTimer = new timers.compensateTimer(100,10,50);
+    testCompensateTimer = new timers.compensateTimer(5,50,50);
     testCompensateTimer.addListener('start', function(startEvent) {
 
       startTime = startEvent.startTime;
@@ -206,9 +204,13 @@ describe('CompensateTimer', function() {
 
     setTimeout(function(){
 
-      console.log((stopTime-startTime) - 1000);
+      var totalLag = (stopTime - startTime) - 250;
+
+      Math.abs(totalLag).should.be.below(200);
+
       stopTime.should.not.be.null;
+      testCompensateTimer = null;
       done();
-    }, 100);
+    }, 400);
   });
 });
